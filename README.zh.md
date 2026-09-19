@@ -145,4 +145,16 @@ README.upstream.zh.md 上游中文说明（原文保留）
 
 GitHub Actions 在 Node 20 与 22 上运行 `npm test` 与 `npm run check`。
 
-MIT，与原版一致；原版作者 [devacc8](https://github.com/devacc8)。
+## 版权与署名
+
+本项目沿用上游的 MIT 许可证（`LICENSE` 全文未改动，只增补了一行署名）：
+
+```
+Copyright (c) 2026 Alex Vega                          # 原版作者，保留
+Copyright (c) 2026 Shuang Sun — changes in the Simplified Chinese fork
+```
+
+- 原版：[devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge)（作者 devacc8 / Alex Vega）；
+- 简体中文分支的改动部分：[moz-hao](https://github.com/moz-hao) 维护。
+
+MIT 允许自由使用、修改与再分发（含商用），条件是保留许可证全文与上述版权声明。

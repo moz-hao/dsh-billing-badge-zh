@@ -147,4 +147,15 @@ test/            season, sync, host and bundle tests
 
 GitHub Actions runs `npm test` and `npm run check` on Node 20 and 22.
 
-MIT.
+## Copyright
+
+MIT, inherited from upstream; the license text in `LICENSE` is unchanged apart from one
+added notice line:
+
+```
+Copyright (c) 2026 Alex Vega                          # upstream author, kept
+Copyright (c) 2026 Shuang Sun — changes in the Simplified Chinese fork
+```
+
+Upstream: [devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge).
+Simplified Chinese fork maintained by [moz-hao](https://github.com/moz-hao).
