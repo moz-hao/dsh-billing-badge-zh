@@ -137,6 +137,7 @@ lib/season.js    时段规则、倒计时与格式化（唯一事实来源，有
 lib/index.js     宿主部分：余额路由
 lib/client.js    浏览器部分：胶囊与面板，season.js 已内联
 cordis.patch.yml 把宿主部分挂载进 profile
+package.json     名字沿用上游（同一插件不能装两份），版本为 0.1.3-zh.1
 scripts/         内联脚本 + node_modules 汉化补丁（PowerShell）
 test/            时段、内联同步、宿主与浏览器端包的测试
 README.en.md     上游英文说明（原文保留）
