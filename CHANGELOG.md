@@ -27,10 +27,10 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- 包名由上游的 `dsh-billing-badge` 改为独立的 **`dsh-billing-badge-zh`**，因此本分支与英文原版
-  可以并存安装，也不会占用上游在 npm 上的包名。`cordis.patch.yml` 里的 loader entry `id` 仍为
-  `billing-badge`（它同时是宿主路由 `/plugins/billing-badge/balance` 的前缀，浏览器端也硬编码了
-  这个路径），这样两个包互为可直接替换的 drop-in。
+- 包名由上游的 `dsh-billing-badge` 改为独立的 **`dsh-billing-badge-zh`**，因此不会占用上游在 npm
+  上的包名（“可与原版并存安装”已在 0.1.3-zh.3 更正）。`cordis.patch.yml` 里的 loader entry
+  `id` 仍为 `billing-badge`（它同时是宿主路由 `/plugins/billing-badge/balance` 的前缀，浏览器端
+  也硬编码了这个路径），这样两个包互为可直接替换的 drop-in。
 - 署名从 `LICENSE` 移到独立的 **`NOTICE`**：`LICENSE` 恢复为上游原文（逐字节一致），
   版权声明（Alex Vega + Shuang Sun）写在 `NOTICE` 里，提交时一并纳入 `package.json` 的 `files`。
 - 补丁脚本改名为 `scripts/localize-dsh-billing-badge-zh.ps1`（它汉化的仍是**原版包名**的安装目录）。

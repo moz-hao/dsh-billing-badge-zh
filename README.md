@@ -70,8 +70,12 @@ total_balance = granted_balance + topped_up_balance
 
 ## 安装
 
-本分支是**独立包名 `dsh-billing-badge-zh`**，因此可以和英文原版 `dsh-billing-badge`
-并存（两者不会互相顶掉，只是同一时间只会有一枚胶囊挂到统计行上）。
+本分支使用**独立包名 `dsh-billing-badge-zh`**，不占用上游在 npm 上的包名。
+但**同一 profile 里两者只能装一个**：两个包的 `cordis.patch.yml` 都用 loader entry
+`id: billing-badge`，宿主路由也都注册 `/plugins/billing-badge/balance`，同时装会在启动时抛
+`duplicate loader entry id: billing-badge`（即使绕过它，第二条路由也会被 webserver 以
+`duplicate prefix route` 拒绝）。想同时保留英文原版，就装到**另一个 profile**，或把其中一个包的
+entry id 与 `/plugins/<id>/balance` 路由前缀一起改掉。
 
 **方式一：直接从本仓库安装**
 
