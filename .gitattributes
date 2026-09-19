@@ -1,0 +1,13 @@
+# 仓库内一律存 LF：上游 CSS/JS 源码与本分支的脚本都以 LF 提交，
+# 工作区在 Windows 上检出为 CRLF 也不会污染 diff。
+* text=auto eol=lf
+
+# PowerShell 脚本在 Windows 上必须按 CRLF 工作更稳，但仓库内仍存 LF。
+*.ps1 text eol=lf
+
+# 图片是二进制，不要做行尾转换。
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary

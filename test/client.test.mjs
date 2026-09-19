@@ -132,7 +132,7 @@ test('mountChip appends one native-looking pill and removes it on teardown', () 
   const [dot, label] = chip.children
   assert.equal(label.textContent, phase.compact)
   assert.equal(dot.style.background, phase.color)
-  assert.match(chip.title, /Beijing time/)
+  assert.match(chip.title, /北京时间/)
 
   teardown()
   assert.equal(chip.removed, true)
@@ -144,10 +144,10 @@ test('a balance with no grant stays one row', () => {
     ok: true, currency: 'USD', total: 12.89, granted: 0, toppedUp: 12.89, isAvailable: true,
   })
   const keys = rows.map(([key]) => key)
-  assert.deepEqual(keys.slice(0, 3), ['Billing season', 'Next switch', 'Beijing time'])
+  assert.deepEqual(keys.slice(0, 3), ['计费时段', '下次切换', '北京时间'])
   assert.deepEqual(
     keys.slice(3),
-    ['Account balance'],
+    ['账户余额'],
     'the topped-up amount IS the total here, so the split would repeat the row above',
   )
   assert.equal(rows[3][1], '$12.89 USD')
@@ -158,7 +158,7 @@ test('a split balance names both parts', () => {
     ok: true, currency: 'USD', total: 21.09, granted: 5, toppedUp: 16.09, isAvailable: true,
   })
   const keys = rows.map(([key]) => key)
-  assert.deepEqual(keys.slice(3), ['Account balance', 'Granted', 'Topped up'])
+  assert.deepEqual(keys.slice(3), ['账户余额', '赠送额度', '充值余额'])
   assert.equal(rows[4][1], '$5')
   assert.equal(rows[5][1], '$16.09')
 })
@@ -167,12 +167,12 @@ test('a grant with nothing topped up names the grant alone', () => {
   const rows = loaded.__internal.panelBody({
     ok: true, currency: 'USD', total: 5, granted: 5, toppedUp: 0, isAvailable: true,
   })
-  assert.deepEqual(rows.map(([key]) => key).slice(3), ['Account balance', 'Granted'])
+  assert.deepEqual(rows.map(([key]) => key).slice(3), ['账户余额', '赠送额度'])
 })
 
 test('a reading without the split fields still shows the balance', () => {
   const rows = loaded.__internal.panelBody({ ok: true, currency: 'CNY', total: 7, isAvailable: true })
-  assert.deepEqual(rows.map(([key]) => key).slice(3), ['Account balance'])
+  assert.deepEqual(rows.map(([key]) => key).slice(3), ['账户余额'])
   assert.equal(rows[3][1], '\u00a57 CNY')
 })
 
@@ -180,14 +180,14 @@ test('the panel warns only when the API reports the balance as insufficient', ()
   const rows = loaded.__internal.panelBody({
     ok: true, currency: 'USD', total: 1, granted: 0, toppedUp: 1, isAvailable: false,
   })
-  assert.deepEqual(rows.at(-1), ['API calls', 'insufficient balance', 'warn'])
+  assert.deepEqual(rows.at(-1), ['接口调用', '余额不足', 'warn'])
 })
 
 test('a degraded reading still fills the balance slot', () => {
   const missing = loaded.__internal.panelBody({ ok: false, state: 'no-credential' })
-  assert.deepEqual(missing.at(-1), ['Account balance', 'no API key configured'])
+  assert.deepEqual(missing.at(-1), ['账户余额', '未配置 API Key'])
   const failed = loaded.__internal.panelBody({ ok: false, state: 'error', error: 'HTTP 401' })
-  assert.deepEqual(failed.at(-1), ['Account balance', 'unavailable'])
+  assert.deepEqual(failed.at(-1), ['账户余额', '暂不可用'])
 })
 
 /**
@@ -261,7 +261,7 @@ const openPanel = () => {
 test('the panel opens on a click and carries no currency remark', () => {
   const { chip, panel, teardown } = openPanel()
   assert.equal(panel.className, 'dsh-billing-panel')
-  assert.equal(panel.getAttribute('aria-label'), 'Billing and balance')
+  assert.equal(panel.getAttribute('aria-label'), '计费时段与余额')
   assert.equal(panel.queried['.dsh-billing-note'].textContent, '', 'a funded account needs no note')
   assert.equal(chip.getAttribute('aria-expanded'), 'true')
   teardown()

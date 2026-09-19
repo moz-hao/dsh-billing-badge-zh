@@ -5,6 +5,25 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3-zh.1] - 2026-09-19
+
+简体中文分支（fork）。基线为上游 `0.1.3`（commit `8f218f3`），以下改动全部集中在展示层。
+
+### Changed
+
+- 界面文案汉化：胶囊 `Peak`/`Off-peak` → **峰时/谷时**，面板标题与字段（计费时段、下次切换、
+  北京时间、账户余额、赠送额度、充值余额、接口调用）、状态值、悬停提示、宿主侧错误文案全部改为简体中文。
+- 倒计时格式改为中文单位（`2h13m` → `2小时13分`、`45m` → `45分`、`38s` → `38秒`）；星期改为
+  `周一`…`周日`。
+- 刷新按钮由文字 `Refresh` 改为 **⟳**（`&#8635;`），位置与尺寸不变。
+- 原生统计行的缓存命中胶囊改为双语匹配（`/cache hit|缓存命中/i`），中文界面下胶囊同样能挂到统计行。
+- 测试断言同步改为中文，29 → 39 项全部通过（`npm test`）。
+
+### Unchanged
+
+- 峰时窗口判定、周末排除、边界翻转逻辑；余额路由与请求头/同源两道安全闸；零落盘；仅访问
+  `api.deepseek.com`。
+
 ## [0.1.3] - 2026-09-18
 
 ### Changed

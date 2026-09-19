@@ -97,26 +97,26 @@ test('every returned target really flips the state, scanned across nine days', (
 // ---------- formatting and description ----------
 
 test('countdown formatting', () => {
-  assert.equal(formatCountdown(2 * HOUR + 13 * 60 * 1000), '2h13m')
-  assert.equal(formatCountdown(45 * 60 * 1000), '45m')
-  assert.equal(formatCountdown(38 * 1000), '38s')
-  assert.equal(formatCountdown(-5), '0s', 'never shows a negative time')
+  assert.equal(formatCountdown(2 * HOUR + 13 * 60 * 1000), '2小时13分')
+  assert.equal(formatCountdown(45 * 60 * 1000), '45分')
+  assert.equal(formatCountdown(38 * 1000), '38秒')
+  assert.equal(formatCountdown(-5), '0秒', 'never shows a negative time')
 })
 
 test('beijing clock reads the shifted wall time', () => {
-  assert.deepEqual(beijingClock(bj(9, 7, 9, 5)), { weekday: 'Monday', clock: '09:05' })
-  assert.deepEqual(beijingClock(bj(9, 5, 18, 0)), { weekday: 'Saturday', clock: '18:00' })
+  assert.deepEqual(beijingClock(bj(9, 7, 9, 5)), { weekday: '周一', clock: '09:05' })
+  assert.deepEqual(beijingClock(bj(9, 5, 18, 0)), { weekday: '周六', clock: '18:00' })
 })
 
 test('describePhase carries a consistent label, color and countdown', () => {
   const peak = describePhase(bj(9, 7, 10, 0))
   assert.equal(peak.peak, true)
-  assert.equal(peak.label, 'Peak')
-  assert.equal(peak.countdown, '2h00m')
+  assert.equal(peak.label, '峰时')
+  assert.equal(peak.countdown, '2小时0分')
   assert.equal(peak.color, '#D9A24A')
   const off = describePhase(bj(9, 12, 10, 0))
   assert.equal(off.peak, false)
   assert.equal(off.color, '#57C07C')
-  assert.equal(off.countdown, '47h00m')
-  assert.match(off.title, /Off-peak/)
+  assert.equal(off.countdown, '47小时0分')
+  assert.match(off.title, /谷时/)
 })
