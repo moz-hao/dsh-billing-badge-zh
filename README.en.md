@@ -2,12 +2,14 @@
 
 English | [中文](README.zh.md)
 
+[![test](https://github.com/moz-hao/dsh-billing-badge-zh/actions/workflows/test.yml/badge.svg)](https://github.com/moz-hao/dsh-billing-badge-zh/actions/workflows/test.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-> **Simplified Chinese fork.** This file is the upstream README, kept verbatim for
-> reference. The UI strings in this branch are Chinese; see [README.md](README.md)
-> for the fork's documentation and the exact diff against upstream.
-> Upstream: [devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge).
+> **Simplified Chinese fork.** This file is the upstream README plus a fork note and a
+> CI badge; the body text is unchanged. The UI strings in this branch are Chinese; see
+> [README.md](README.md) for the fork's documentation and the exact diff against
+> upstream. Upstream:
+> [devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge).
 
 Billing season and account balance for the DeepSeek Harness web GUI. A pill in the
 composer's statistics row, immediately after the native **Cache hit** reading, that

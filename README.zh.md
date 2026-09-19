@@ -2,6 +2,7 @@
 
 [English](README.en.md) | [上游中文说明](README.upstream.zh.md) | 中文
 
+[![test](https://github.com/moz-hao/dsh-billing-badge-zh/actions/workflows/test.yml/badge.svg)](https://github.com/moz-hao/dsh-billing-badge-zh/actions/workflows/test.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 DeepSeek Harness 网页界面的**计费时段与账户余额**插件。它在输入框的统计行里、原生
