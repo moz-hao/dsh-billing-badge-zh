@@ -1,0 +1,25 @@
+dsh-billing-badge-zh
+====================
+
+This repository is a fork of dsh-billing-badge, and the files it ships are
+distributed under the MIT License reproduced in LICENSE.
+
+The license text in LICENSE is the upstream file, byte for byte unchanged. The
+copyright notices below are the notices required by that license: the first line
+is the upstream author's, the second states who owns the changes made in this
+fork. Nothing here modifies, replaces or restricts the license.
+
+    Copyright (c) 2026 Alex Vega
+        upstream author of dsh-billing-badge
+        https://github.com/devacc8/dsh-billing-badge
+
+    Copyright (c) 2026 Shuang Sun
+        changes in the Simplified Chinese fork (everything this fork adds or
+        alters relative to upstream commit 8f218f3)
+        https://github.com/moz-hao/dsh-billing-badge-zh
+
+What this fork changes is listed in CHANGELOG.md under [0.1.3-zh.1] and in the
+README section "与原版的差异". The upstream license already permits use,
+modification and redistribution, including commercially, provided the copyright
+notice and the permission notice are kept — which is why the upstream line above
+is reproduced and not replaced.

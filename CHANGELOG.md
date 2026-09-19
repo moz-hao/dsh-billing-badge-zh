@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3-zh.2] - 2026-09-19
+
+### Changed
+
+- 包名由上游的 `dsh-billing-badge` 改为独立的 **`dsh-billing-badge-zh`**，因此本分支与英文原版
+  可以并存安装，也不会占用上游在 npm 上的包名。`cordis.patch.yml` 里的 loader entry `id` 仍为
+  `billing-badge`（它同时是宿主路由 `/plugins/billing-badge/balance` 的前缀，浏览器端也硬编码了
+  这个路径），这样两个包互为可直接替换的 drop-in。
+- 署名从 `LICENSE` 移到独立的 **`NOTICE`**：`LICENSE` 恢复为上游原文（逐字节一致），
+  版权声明（Alex Vega + Shuang Sun）写在 `NOTICE` 里，提交时一并纳入 `package.json` 的 `files`。
+- 补丁脚本改名为 `scripts/localize-dsh-billing-badge-zh.ps1`（它汉化的仍是**原版包名**的安装目录）。
+
 ## [0.1.3-zh.1] - 2026-09-19
 
 简体中文分支（fork）。基线为上游 `0.1.3`（commit `8f218f3`），以下改动全部集中在展示层。

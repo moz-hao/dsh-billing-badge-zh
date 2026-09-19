@@ -1,6 +1,13 @@
-# dsh-billing-badge bundle patch: mounts the host half into the profile's host
+# dsh-billing-badge-zh bundle patch: mounts the host half into the profile's host
 # composition. Applied by `dsh plugin --profile web add <this package>`, which
 # reconciles the package into dsh.profile.bundles automatically.
+#
+# `name` here is the PACKAGE to load, so it must match package.json's "name".
+# `id` is deliberately left at upstream's `billing-badge`: it is the loader entry
+# id and the first segment of the host route (/plugins/billing-badge/balance),
+# which the browser half also hardcodes. Keeping it stable means the Chinese fork
+# and upstream are drop-in replacements for each other, and it cannot collide
+# either way because a profile has only one of the two installed.
 - insert:
     - id: billing-badge
-      name: dsh-billing-badge
+      name: dsh-billing-badge-zh

@@ -4,10 +4,17 @@
     把已安装的 dsh-billing-badge（英文原版）就地汉化，或还原成英文。
 
 .DESCRIPTION
-    本仓库是原版的简体中文分支。如果你不想换安装来源，只想把**已经装好的 npm 原版**
-    变成中文界面，就跑这个脚本；它对本仓库的 lib/ 改动做等价的字符串替换。
+    本仓库是原版的简体中文分支，包名也改成了独立的 dsh-billing-badge-zh，
+    所以正常情况下你直接装本仓库就是中文，**用不到这个脚本**：
 
-    目标目录默认 $env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-billing-badge：
+        dsh plugin --profile web add github:moz-hao/dsh-billing-badge-zh
+
+    它的用途只有一个：你已经在用 npm 上的英文原版 dsh-billing-badge（不想换来源、
+    不想重装），只想把它就地把界面变中文。这时它对三个文件做与本仓库 lib/ 等价的
+    字符串替换。
+
+    目标目录默认 $env:USERPROFILE\.dsh\profiles\web\node_modules\dsh-billing-badge
+    （注意是**原版包名**，不是本分支的 dsh-billing-badge-zh）：
       * 首次运行前把三个待改文件备份为 *.orig-zh
       * 每处替换都是「英文原文 -> 中文译文」的精确匹配；已汉化的文件跳过，
         因此重复运行安全（幂等），升级被覆盖后直接再跑一次即可
@@ -19,9 +26,9 @@
     这时请以仓库里的 lib/ 为准（它是本分支的事实来源），或按提示补规则。
 
 .EXAMPLE
-    pwsh -File scripts/localize-dsh-billing-badge.ps1
-    pwsh -File scripts/localize-dsh-billing-badge.ps1 -Restore
-    pwsh -File scripts/localize-dsh-billing-badge.ps1 -PluginDirectory 'D:\somewhere\dsh-billing-badge'
+    pwsh -File scripts/localize-dsh-billing-badge-zh.ps1
+    pwsh -File scripts/localize-dsh-billing-badge-zh.ps1 -Restore
+    pwsh -File scripts/localize-dsh-billing-badge-zh.ps1 -PluginDirectory 'D:\somewhere\dsh-billing-badge'
 #>
 [CmdletBinding()]
 param(
@@ -33,7 +40,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 if (-not (Test-Path -LiteralPath $PluginDirectory)) {
-    throw "找不到插件目录：$PluginDirectory（先跑 dsh plugin --profile web add dsh-billing-badge）"
+    throw "找不到插件目录：$PluginDirectory（先跑 dsh plugin --profile web add dsh-billing-badge 装上英文原版）"
 }
 
 # 已安装目录不能是本仓库自己：那说明用户在拿脚本改仓库，而仓库本来就已经是中文

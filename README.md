@@ -70,21 +70,24 @@ total_balance = granted_balance + topped_up_balance
 
 ## 安装
 
-**方式一：直接从本分支仓库安装**
+本分支是**独立包名 `dsh-billing-badge-zh`**，因此可以和英文原版 `dsh-billing-badge`
+并存（两者不会互相顶掉，只是同一时间只会有一枚胶囊挂到统计行上）。
+
+**方式一：直接从本仓库安装**
 
 ```sh
-dsh plugin --profile web add github:<你的用户名>/dsh-billing-badge-zh
+dsh plugin --profile web add github:moz-hao/dsh-billing-badge-zh
 ```
 
-**方式二：从 npm 原版安装后打中文补丁**（适用于已经装了原版、不想换来源的情况）
+**方式二：从 npm 原版安装后打中文补丁**（适用于已经在用英文原版、不想换来源的情况）
 
 ```powershell
-pwsh -File scripts/localize-dsh-billing-badge.ps1
+pwsh -File scripts/localize-dsh-billing-badge-zh.ps1
 # 还原成英文原版：
-pwsh -File scripts/localize-dsh-billing-badge.ps1 -Restore
+pwsh -File scripts/localize-dsh-billing-badge-zh.ps1 -Restore
 ```
 
-该脚本对 `~/.dsh/profiles/web/node_modules/dsh-billing-badge` 里的三个文件做精确字符串替换，
+该脚本对 `~/.dsh/profiles/web/node_modules/dsh-billing-badge`（**原版包名**）里的三个文件做精确字符串替换，
 首次运行会留下 `*.orig-zh` 备份，重复运行安全（幂等），改完自动做语法检查，失败回滚。
 
 装完（或打完补丁）**重启 `dsh web`** 再刷新页面。包内声明了 `dsh.bundle.patch`，宿主部分会自动写入 profile 的 bundle 列表。
@@ -137,9 +140,11 @@ lib/season.js    时段规则、倒计时与格式化（唯一事实来源，有
 lib/index.js     宿主部分：余额路由
 lib/client.js    浏览器部分：胶囊与面板，season.js 已内联
 cordis.patch.yml 把宿主部分挂载进 profile
-package.json     名字沿用上游（同一插件不能装两份），版本为 0.1.3-zh.1
+package.json     独立包名 dsh-billing-badge-zh，版本 0.1.3-zh.2
 scripts/         内联脚本 + node_modules 汉化补丁（PowerShell）
 test/            时段、内联同步、宿主与浏览器端包的测试
+LICENSE          上游 MIT 许可证原文（未改动）
+NOTICE           版权声明：上游作者 + 本分支改动的著作权人
 README.en.md     上游英文说明（原文保留）
 README.upstream.zh.md 上游中文说明（原文保留）
 ```
@@ -148,14 +153,22 @@ GitHub Actions 在 Node 20 与 22 上运行 `npm test` 与 `npm run check`。
 
 ## 版权与署名
 
-本项目沿用上游的 MIT 许可证（`LICENSE` 全文未改动，只增补了一行署名）：
+本项目沿用上游的 MIT 许可证。为让「许可证没被动过」一眼可查，署名与许可正文**分开放在两个文件**：
+
+- **`LICENSE`** —— 上游 MIT 原文，**逐字节未改动**（`Copyright (c) 2026 Alex Vega`）；
+- **`NOTICE`** —— 版权声明：
 
 ```
-Copyright (c) 2026 Alex Vega                          # 原版作者，保留
-Copyright (c) 2026 Shuang Sun — changes in the Simplified Chinese fork
+Copyright (c) 2026 Alex Vega
+    upstream author of dsh-billing-badge
+    https://github.com/devacc8/dsh-billing-badge
+
+Copyright (c) 2026 Shuang Sun
+    changes in the Simplified Chinese fork
+    https://github.com/moz-hao/dsh-billing-badge-zh
 ```
 
 - 原版：[devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge)（作者 devacc8 / Alex Vega）；
 - 简体中文分支的改动部分：[moz-hao](https://github.com/moz-hao) 维护。
 
-MIT 允许自由使用、修改与再分发（含商用），条件是保留许可证全文与上述版权声明。
+MIT 允许自由使用、修改与再分发（含商用），条件是保留许可证正文与 `NOTICE` 里的版权声明；本分支对上游改动的著作权归 Shuang Sun，上游部分仍归 Alex Vega。

@@ -149,12 +149,15 @@ GitHub Actions runs `npm test` and `npm run check` on Node 20 and 22.
 
 ## Copyright
 
-MIT, inherited from upstream; the license text in `LICENSE` is unchanged apart from one
-added notice line:
+MIT, inherited from upstream. The license text in `LICENSE` is the upstream file, kept
+byte for byte; the copyright notices required by it live in `NOTICE` instead, so the
+license file itself is verifiably untouched:
 
 ```
-Copyright (c) 2026 Alex Vega                          # upstream author, kept
-Copyright (c) 2026 Shuang Sun — changes in the Simplified Chinese fork
+Copyright (c) 2026 Alex Vega
+    upstream author of dsh-billing-badge
+Copyright (c) 2026 Shuang Sun
+    changes in the Simplified Chinese fork
 ```
 
 Upstream: [devacc8/dsh-billing-badge](https://github.com/devacc8/dsh-billing-badge).
