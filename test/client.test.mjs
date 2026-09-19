@@ -10,6 +10,7 @@ import { describePhase } from '../lib/season.js'
  * statistics strip.
  */
 const code = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 
 /** Record listeners so a test can drive the handlers the bundle registered. */
 const withListeners = (target) => {
@@ -100,7 +101,9 @@ globalThis.MutationObserver = class { observe() {} disconnect() {} }
 new Function('window', 'document', 'MutationObserver', code)(windowStub, documentStub, globalThis.MutationObserver)
 
 test('the bundle loads through the ModuleLoader contract', () => {
-  assert.equal(loadedId, 'dsh-billing-badge')
+  // The host graph keys each row by package.json's name, and the browser refuses
+  // a bundle that registers anything else: "loaded without registering <row>".
+  assert.equal(loadedId, pkg.name)
   assert.equal(typeof loaded.apply, 'function')
   assert.deepEqual(loaded.inject, ['slots'], 'inject is a service list, not a function')
 })

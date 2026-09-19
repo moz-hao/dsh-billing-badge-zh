@@ -140,7 +140,7 @@ lib/season.js    时段规则、倒计时与格式化（唯一事实来源，有
 lib/index.js     宿主部分：余额路由
 lib/client.js    浏览器部分：胶囊与面板，season.js 已内联
 cordis.patch.yml 把宿主部分挂载进 profile
-package.json     独立包名 dsh-billing-badge-zh，版本 0.1.3-zh.2
+package.json     独立包名 dsh-billing-badge-zh，版本 0.1.3-zh.3
 scripts/         内联脚本 + node_modules 汉化补丁（PowerShell）
 test/            时段、内联同步、宿主与浏览器端包的测试
 LICENSE          上游 MIT 许可证原文（未改动）

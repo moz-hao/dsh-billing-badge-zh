@@ -5,6 +5,24 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3-zh.3] - 2026-09-19
+
+### Fixed
+
+- 浏览器半的模块 id 与包名对齐：`lib/client.js` 现在以 **`dsh-billing-badge-zh`** 调用
+  `__ModuleLoader__.load`。0.1.3-zh.2 改了包名却仍沿用上游的 `dsh-billing-badge`，而宿主的客户端
+  模块图是以 `package.json` 的 `name` 作为 row id 的，浏览器拿到
+  `/plugins/??…,dsh-billing-badge-zh/client.js,…` 这个 combo 后找不到同名注册，于是整屏报
+  `Failed to load plugins — failed to import loader entry … (dsh-billing-badge-zh): client-modules:
+  bundle … loaded without registering "dsh-billing-badge-zh" via __ModuleLoader__.load`，网页打不开。
+  宿主路由 `/plugins/billing-badge/balance` 与 `cordis.patch.yml` 里的 loader entry `id`
+  （`billing-badge`）**未改动**，两个包名仍然只需替换依赖即可。
+  > 注意：因为两个包的 loader entry `id` 都是 `billing-badge`、宿主路由也都注册
+  > `/plugins/billing-badge/balance`，**同一 profile 里同时安装本分支与英文原版依旧会冲突**；
+  > 0.1.3-zh.2 里“可以并存”的说法只对包名成立。
+- `test/client.test.mjs` 改为直接用 `package.json` 的 `name` 断言注册 id：以后包名与模块 id 再
+  分叉，测试会当场失败，而不是等到浏览器里整屏报错。
+
 ## [0.1.3-zh.2] - 2026-09-19
 
 ### Changed
