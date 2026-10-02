@@ -272,34 +272,57 @@ test('the panel opens on a click and carries no currency remark', () => {
 })
 
 /**
- * The panel surface must not be translucent. The harness theme resolves
- * `--dsw-specific-menu` to a colour with alpha (45% in the dark theme, 58% in
- * the light one), so painting only that variable lets the composer text behind
- * the panel bleed through on the desktop host. This fork composites it over the
- * theme's opaque page background instead: the CSS needs a SECOND background
- * declaration whose last layer is the opaque base, and no declaration may leave
- * the menu fill as the only layer.
+ * The panel surface must be OPAQUE. Two attempts at solving this in a
+ * theme-faithful way are worth knowing about, because both can regress:
+ *
+ *  1. upstream paints only the theme menu colour, and that colour carries alpha
+ *     (#43454a73 = 45% in the dark theme, #f8f9fa94 = 58% in the light one), so
+ *     the composer text behind the panel shows through;
+ *  2. composing it as `background: var(--dsw-specific-menu),
+ *     var(--dsw-alias-bg-base)` also failed in the field — the panel came out
+ *     fully transparent on the desktop host.
+ *
+ * What ships now is a hard-coded solid colour: the value the translucent menu
+ * colour composites to over the theme page background (dark #2A2B2E, light
+ * #FBFBFC). CSS has to resolve no variables for it, and the declaration that
+ * wins the cascade must be a colour with no alpha channel.
  */
-test('the panel paints an opaque surface over the translucent theme menu colour', () => {
+const alphaOf = (colour) => {
+  const value = colour.trim()
+  const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{4}|[0-9a-f]{6}|[0-9a-f]{8})$/i)
+  if (hex !== null) {
+    const digits = hex[1]
+    if (digits.length === 3 || digits.length === 4) return digits.length === 3 ? 1 : parseInt(digits[3] + digits[3], 16) / 255
+    return digits.length === 6 ? 1 : parseInt(digits.slice(6, 8), 16) / 255
+  }
+  const rgb = value.match(/^rgba?\(([^)]+)\)$/i)
+  if (rgb !== null) {
+    const parts = rgb[1].split(/[\s,/]+/).filter(Boolean)
+    return parts.length >= 4 ? Number(parts[3]) : 1
+  }
+  return null
+}
+
+test('the panel paints a solid, fully opaque surface', () => {
   const css = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
-  const panel = css.slice(css.indexOf('.dsh-billing-panel {'), css.indexOf('.dsh-billing-head {'))
-  assert.ok(panel.length > 0, 'the panel rule is present in the bundle')
-  const layers = [...panel.matchAll(/background:\s*([^;]+);/g)].map((m) => m[1].trim())
-  assert.ok(layers.length >= 2, `expected a base layer plus a composited one, saw ${layers.length}`)
-  const opaque = layers.filter((value) => /var\(--dsw-alias-bg-base/.test(value))
+  const start = css.indexOf('.dsh-billing-panel {')
+  const panel = css.slice(start, css.indexOf('.dsh-billing-head {'))
+  assert.ok(start !== -1 && panel.length > 0, 'the panel rule is present in the bundle')
+
+  const declarations = [...panel.matchAll(/background:\s*([^;]+);/g)].map((m) => m[1].trim())
+  assert.ok(declarations.length >= 1, 'the panel declares a background')
+  const winner = declarations.at(-1)
   assert.ok(
-    opaque.length >= 2,
-    'both the base layer and the composited layer must include the opaque page background',
+    !/var\(/.test(winner),
+    `the winning background must not depend on theme variables, saw ${winner}`,
   )
-  assert.match(
-    layers.at(-1),
-    /^var\(--dsw-specific-menu\),\s*var\(--dsw-alias-bg-base/,
-    'the winning declaration composites the menu fill over the opaque base',
-  )
-  assert.ok(
-    !layers.some((value) => /^var\(--dsw-specific-menu\)$/.test(value)),
-    'a lone translucent menu fill must not survive as a later declaration',
-  )
+  assert.equal(alphaOf(winner), 1, `the winning background must be opaque, saw ${winner}`)
+
+  // and the light-theme override has to be opaque as well
+  const override = css.slice(css.indexOf('@media (prefers-color-scheme: light)'))
+  const light = override.match(/background:\s*([^;]+);/)
+  assert.ok(light !== null, 'a light-theme surface override is present')
+  assert.equal(alphaOf(light[1]), 1, `the light-theme background must be opaque, saw ${light[1]}`)
 })
 
 test('a scroll repositions the open panel instead of closing it', () => {
