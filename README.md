@@ -60,6 +60,13 @@ total_balance = granted_balance + topped_up_balance
 | 刷新按钮 | 文字 `Refresh` | **⟳**（`&#8635;`） |
 | 原生统计行匹配 | `/cache hit/i` | **`/cache hit\|缓存命中/i`**（中文界面下也能认得那枚胶囊） |
 | 宿主侧错误文案 | 英文 | **中文**（未配置 DEEPSEEK_API_KEY / 缺少插件请求头 / 已拒绝跨站请求 / 余额响应异常） |
+| 面板底色 | 只画一层主题菜单色（该色带 alpha：深色 45%、浅色 58%），桌面版上后面的输入框文字会透出来 | **两层背景叠加成不透明**（见下） |
+
+**面板不透明化**：harness 主题里的菜单色本身是半透明的（深色 `#43454a73`、浅色 `#f8f9fa94`），
+上游直接把它当面板底色，于是面板后面的内容会透出来（桌面版尤其明显）。本分支改为
+`background: var(--dsw-specific-menu), var(--dsw-alias-bg-base)` —— 用主题自带的**不透明页面底色**
+垫底、同一层菜单色叠在上面，合成出「本应有的菜单色 + 完全不透明」（深色主题下为 `rgb(42 43 46)`）。
+两个变量在每套主题里都会重新声明，顺序无关；`test/client.test.mjs` 有回归断言。
 
 **未改动**：峰时窗口判定、周末排除、边界翻转（周五 18:00 后直接指向周一 09:00）、
 余额路由与两道安全闸（请求头 + 同源校验）、零落盘、只访问 `api.deepseek.com`。
@@ -144,7 +151,7 @@ lib/season.js    时段规则、倒计时与格式化（唯一事实来源，有
 lib/index.js     宿主部分：余额路由
 lib/client.js    浏览器部分：胶囊与面板，season.js 已内联
 cordis.patch.yml 把宿主部分挂载进 profile
-package.json     独立包名 dsh-billing-badge-zh，版本 0.1.3-zh.3
+package.json     独立包名 dsh-billing-badge-zh，版本 0.1.3-zh.4
 scripts/         内联脚本 + node_modules 汉化补丁（PowerShell）
 test/            时段、内联同步、宿主与浏览器端包的测试
 LICENSE          上游 MIT 许可证原文（未改动）

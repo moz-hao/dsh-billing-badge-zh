@@ -5,6 +5,19 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3-zh.4] - 2026-10-02
+
+### Fixed
+
+- **面板不再半透明**（桌面版尤其明显）：上游只画了一层主题菜单色，而 harness 主题把它定义为**带 alpha
+  的颜色**——深色主题 `#43454a73`（45%）、浅色主题 `#f8f9fa94`（58%），macOS 覆写又是
+  `rgba(…, .94)`。于是面板后面的输入框文字（模型名、统计读数）会透出来。本分支改成**两层背景**：
+  底下是主题自带的**不透明页面底色** `--dsw-alias-bg-base`（深浅两套主题里都是实色 hex），上面叠同一层
+  菜单色，合成结果就是「本应有的菜单色、但完全不透明」（深色主题下为 `rgb(42 43 46)`）。两个变量在每套
+  主题里都会重新声明，因此顺序无关。
+- 新增回归测试：`test/client.test.mjs` 断言面板 CSS 必须包含「不透明底色 + 叠加」两层，且不允许
+  只剩一层半透明菜单色的声明（40 项测试全绿）。
+
 ## [0.1.3-zh.3] - 2026-09-19
 
 ### Fixed

@@ -271,6 +271,37 @@ test('the panel opens on a click and carries no currency remark', () => {
   assert.equal(panel.removed, true, 'teardown removes the panel')
 })
 
+/**
+ * The panel surface must not be translucent. The harness theme resolves
+ * `--dsw-specific-menu` to a colour with alpha (45% in the dark theme, 58% in
+ * the light one), so painting only that variable lets the composer text behind
+ * the panel bleed through on the desktop host. This fork composites it over the
+ * theme's opaque page background instead: the CSS needs a SECOND background
+ * declaration whose last layer is the opaque base, and no declaration may leave
+ * the menu fill as the only layer.
+ */
+test('the panel paints an opaque surface over the translucent theme menu colour', () => {
+  const css = readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8')
+  const panel = css.slice(css.indexOf('.dsh-billing-panel {'), css.indexOf('.dsh-billing-head {'))
+  assert.ok(panel.length > 0, 'the panel rule is present in the bundle')
+  const layers = [...panel.matchAll(/background:\s*([^;]+);/g)].map((m) => m[1].trim())
+  assert.ok(layers.length >= 2, `expected a base layer plus a composited one, saw ${layers.length}`)
+  const opaque = layers.filter((value) => /var\(--dsw-alias-bg-base/.test(value))
+  assert.ok(
+    opaque.length >= 2,
+    'both the base layer and the composited layer must include the opaque page background',
+  )
+  assert.match(
+    layers.at(-1),
+    /^var\(--dsw-specific-menu\),\s*var\(--dsw-alias-bg-base/,
+    'the winning declaration composites the menu fill over the opaque base',
+  )
+  assert.ok(
+    !layers.some((value) => /^var\(--dsw-specific-menu\)$/.test(value)),
+    'a lone translucent menu fill must not survive as a later declaration',
+  )
+})
+
 test('a scroll repositions the open panel instead of closing it', () => {
   const { chip, panel, teardown } = openPanel()
   windowStub.listeners.scroll[0]()
