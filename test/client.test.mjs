@@ -38,8 +38,8 @@ const makeElement = (tag) => withListeners({
   classList: { toggle() {}, add() {}, remove() {} },
   setAttribute(key, value) { this.attributes[key] = String(value) },
   getAttribute(key) { return this.attributes[key] },
-  append(...nodes) { this.children.push(...nodes) },
-  appendChild(node) { this.children.push(node); return node },
+  append(...nodes) { for (const node of nodes) { node.parentElement = this }; this.children.push(...nodes) },
+  appendChild(node) { node.parentElement = this; this.children.push(node); return node },
   replaceChildren(...nodes) { this.children = nodes },
   remove() { this.removed = true },
   contains() { return false },
@@ -108,19 +108,28 @@ test('the bundle loads through the ModuleLoader contract', () => {
   assert.deepEqual(loaded.inject, ['slots'], 'inject is a service list, not a function')
 })
 
-test('apply registers into the composer dock with order 10', () => {
+test('apply registers the dock and the hero control row', () => {
   const registered = []
   const ctx = {
     slots: {
-      inject: (slot, cb) => { assert.equal(slot, 'conversation.composer.dock'); cb() },
+      inject: (slot, cb) => { cb() },
       register: (spec) => { registered.push(spec) },
     },
   }
   loaded.apply(ctx)
-  assert.equal(registered.length, 1)
-  assert.equal(registered[0].name, 'conversation.composer.dock')
-  assert.equal(registered[0].id, 'billing-badge')
-  assert.equal(registered[0].order, 10, 'the native stats strip is order 0, so 10 lands after it')
+  const bySlot = Object.fromEntries(registered.map((spec) => [spec.name, spec]))
+  assert.deepEqual(
+    Object.keys(bySlot).sort(),
+    ['conversation.composer.dock', 'conversation.input.right'],
+    'the hero page renders no dock slot, so the control row is the second host',
+  )
+  assert.equal(bySlot['conversation.composer.dock'].order, 10, 'the native stats strip is order 0, so 10 lands after it')
+  assert.equal(bySlot['conversation.input.right'].order, 20)
+  assert.deepEqual(
+    [...new Set(registered.map((spec) => spec.id))],
+    ['billing-badge'],
+    'both hosts seat the same single chip, so they share one registration id',
+  )
 })
 
 test('mountChip appends one native-looking pill and removes it on teardown', () => {
@@ -188,7 +197,7 @@ test('the panel warns only when the API reports the balance as insufficient', ()
 
 test('a degraded reading still fills the balance slot', () => {
   const missing = loaded.__internal.panelBody({ ok: false, state: 'no-credential' })
-  assert.deepEqual(missing.at(-1), ['账户余额', '未配置 API Key'])
+  assert.deepEqual(missing.at(-1), ['账户余额', '未登录 DeepSeek 账号'])
   const failed = loaded.__internal.panelBody({ ok: false, state: 'error', error: 'HTTP 401' })
   assert.deepEqual(failed.at(-1), ['账户余额', '暂不可用'])
 })
@@ -243,11 +252,32 @@ test('statsRow follows the cache-hit pill into the dock row on 0.1.6', () => {
   )
 })
 
-test('statsRow waits while the dock has no readings yet', () => {
+test('statsRow keeps the chip in a dock that has no readings yet', () => {
   const dock = { children: [], querySelectorAll: () => [] }
   const mod = loadWith({
     querySelector: (selector) => (selector.includes('composer.dock') ? dock : null),
   })
+  assert.equal(
+    mod.__internal.statsRow(),
+    dock,
+    '0.2.x shows ambient entries instead of a cache-hit pill; the chip must stay on screen',
+  )
+})
+
+test('statsRow falls back to the composer control row on the hero page', () => {
+  const controls = makeElement('div')
+  const mod = loadWith({
+    querySelector: (selector) => (selector.includes('conversation.input.right') ? controls : null),
+  })
+  assert.equal(
+    mod.__internal.statsRow(),
+    controls,
+    'harness 0.2.2 renders no conversation.composer.dock before the first turn',
+  )
+})
+
+test('statsRow returns null when neither host exists', () => {
+  const mod = loadWith({ querySelector: () => null })
   assert.equal(mod.__internal.statsRow(), null)
 })
 
@@ -340,4 +370,46 @@ test('a scroll that carries the chip out of sight closes the panel', () => {
   assert.equal(panel.removed, true, 'a panel pointing at nothing closes')
   assert.equal(chip.getAttribute('aria-expanded'), 'false')
   teardown()
+})
+
+/**
+ * Two slots can host the renderless occupant: the composer dock once a turn
+ * exists, and the composer control row on the brand-new hero page. The chip
+ * itself must stay single and follow whichever row currently wins, because the
+ * harness swaps surfaces without remounting the plugin.
+ */
+test('the chip follows the winning row and never doubles up', () => {
+  const hero = makeElement('div')
+  const dock = makeElement('div')
+  dock.querySelectorAll = () => []
+  let dockPresent = false
+  const doc = {
+    head: makeElement('head'),
+    body: makeElement('body'),
+    createElement: (tag) => makeElement(tag),
+    querySelector: (selector) => {
+      if (selector.includes('data-composer-stats')) return null
+      if (selector.includes('composer.dock')) return dockPresent ? dock : null
+      if (selector.includes('conversation.input.right')) return hero
+      if (selector.includes('dsh-billing-badge')) {
+        return [...hero.children, ...dock.children].find((node) => node.removed !== true) ?? null
+      }
+      return null
+    },
+  }
+
+  const mod = loadWith(doc)
+  mod.__internal.ensureSeated()
+  assert.equal(hero.children.length, 1, 'the hero row hosts the chip before any turn exists')
+  const first = hero.children[0]
+  assert.equal(first.className, 'dsh-billing-badge')
+
+  dockPresent = true
+  mod.__internal.ensureSeated()
+  assert.equal(first.removed, true, 'the hero chip is torn down once the dock takes over')
+  assert.equal(dock.children.length, 1, 'exactly one chip lives in the dock')
+  assert.notEqual(dock.children[0], first, 'the dock gets a freshly mounted chip')
+
+  mod.__internal.releaseSeat()
+  assert.equal(dock.children[0].removed, true, 'the last occupant tears the chip down')
 })
