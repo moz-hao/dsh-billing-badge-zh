@@ -91,9 +91,13 @@ dsh plugin --profile web add github:devacc8/dsh-billing-badge
 then restart `dsh web`. The package declares `dsh.bundle.patch`, so the host half is
 reconciled into the profile's bundle list automatically.
 
-Works on DeepSeek Harness 0.1.5 and 0.1.6. Older builds render the composer statistics
-as one labelled row and the chip joins it; 0.1.6 moved those readings into the composer
-dock as pill buttons, and the chip follows the cache-hit pill into that row.
+Works on DeepSeek Harness 0.1.5, 0.1.6 and 0.2.x. Older builds render the composer
+statistics as one labelled row and the chip joins it; 0.1.6 moved those readings into the
+composer dock as pill buttons, and the chip follows the cache-hit pill into that row.
+0.2.2 renders `conversation.composer.dock` only once a session has a turn, so on the
+brand-new hero page the chip first sits in the composer control row beside the model
+picker and moves into the statistics row as soon as the first turn exists — always
+exactly one chip.
 
 Working on the plugin itself, install the checkout by path instead:
 
@@ -108,6 +112,10 @@ A balance is a small surface, so it stays small:
 - the API key is resolved in the host through the DSH credentials seam
   (`ctx.credentials.resolve('DEEPSEEK_API_KEY')`, environment fallback) and never
   reaches the browser;
+- 0.2.x desktops usually sign in to an account and carry no API key at all, so the
+  balance is read in the host through the `deepseekAccount` seam
+  (`getState()` + `getBalance()`); the grant still never leaves the process and the
+  browser only receives numbers;
 - the single route requires the `x-dsh-billing-badge: 1` header and rejects a
   cross-origin `Origin`, so a cross-site page cannot reach it;
 - nothing is written to disk, and no endpoint other than `api.deepseek.com` is

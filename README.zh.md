@@ -113,7 +113,7 @@ pwsh -File scripts/localize-dsh-billing-badge-zh.ps1 -Restore
 
 装完（或打完补丁）**重启 `dsh web`** 再刷新页面。包内声明了 `dsh.bundle.patch`，宿主部分会自动写入 profile 的 bundle 列表。
 
-兼容 DeepSeek Harness 0.1.5 与 0.1.6。0.1.5 把输入框统计渲染成一行带标记的元素，胶囊加入这一行；0.1.6 把这些读数移进输入框底栏变成一排胶囊按钮，胶囊会跟随缓存命中那枚加入同一行——本分支让这个匹配在中文界面下同样成立。
+兼容 DeepSeek Harness 0.1.5、0.1.6 与 0.2.x。0.1.5 把输入框统计渲染成一行带标记的元素，胶囊加入这一行；0.1.6 把这些读数移进输入框底栏变成一排胶囊按钮，胶囊会跟随缓存命中那枚加入同一行——本分支让这个匹配在中文界面下同样成立。0.2.2 只在**已有会话**时渲染 `conversation.composer.dock`，全新会话首页里这个 slot 根本不存在，因此胶囊会先落在输入框卡片右侧控制行（模型选择旁），第一轮对话开始后再自动迁回缓存命中读数之后，全程只有一枚。
 
 在本地开发本分支时，改为按路径安装检出目录：
 
@@ -126,9 +126,10 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-billing-badge-zh
 余额的暴露面很小，插件就让它保持小：
 
 - API key 只在宿主进程中通过 DSH credentials 接口读取（`ctx.credentials.resolve('DEEPSEEK_API_KEY')`，环境变量兜底），不会进入浏览器；
+- 桌面版 0.2.x 通常只登录了账号、没有 API key，因此余额优先通过 `deepseekAccount` seam 在宿主进程内读取（`getState()` + `getBalance()`），密钥同样不出进程，浏览器只拿到数字；
 - 唯一的路由要求请求头 `x-dsh-billing-badge: 1` 并拒绝跨站 `Origin`，因此第三方页面无法访问它；
 - 不写任何文件，除 `api.deepseek.com` 外不访问任何地址；
-- 缺少 key、HTTP 错误或网络故障都会降级为面板可渲染的状态，不会抛异常。
+- 缺少 key、未登录或网络故障都会降级为面板可渲染的状态，不会抛异常。
 
 ## 与上游同步
 

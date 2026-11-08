@@ -5,6 +5,42 @@ All notable changes to this project are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3-zh.7] - 2026-11-08
+
+### Fixed
+
+- **新会话首页（hero）整枚胶囊缺席。** harness 0.2.2 只在「已有会话」时渲染
+  `conversation.composer.dock`（`variant === 'composer'` 且已有输入器与会话 id），全新会话页里
+  这个 slot 根本不存在，而本插件把组件注册在它上面——组件不渲染、`statsRow()` 也没有挂载点，
+  于是宿主端一切正常、页面上什么都看不到（连样式都没注入）。
+  现在 `statsRow()` 在 dock 缺席时回退到输入框卡片右侧控制行
+  （`conversation.input.right`，模型选择旁），并把该 slot 注册为第二个宿主。
+- 座次状态提到模块作用域并计数占位者：两个宿主同时挂载时**只保留一枚**胶囊；会话开始后胶囊
+  自动从控制行迁回原生统计行（缓存命中读数之后），既不会重复也不会因 React 重建而丢失。
+- `__internal` 追加 `ensureSeated` / `releaseSeat`，让上面这条「跟随 + 不重复」能被单测直接驱动。
+
+### Changed
+
+- 回归测试：新增「hero 回退到控制行」「dock 尚无读数时仍留在 dock」「跟随迁移且不重复」
+  等 4 项断言，`node --test` 43 项全绿；改测试先红（旧 bundle 5 项失败）后绿，避免只测新代码。
+
+## [0.1.3-zh.6] - 2026-11-08
+
+### Changed
+
+- **余额优先读已登录的 DeepSeek 账号。** 桌面版 0.2.x 一般只登录账号、不带 API key，
+  原先的 key-only 路径会一直报「未配置」。现在先走 `deepseekAccount` seam
+  （`getState()` → `getBalance()`），密钥仍在宿主进程内，浏览器只拿到数字；
+  账号不可用时才回落到 `DEEPSEEK_API_KEY` 与 `api.deepseek.com/user/balance`。
+- 未登录文案改为「未登录 DeepSeek 账号」；账号侧没有 `is_available` 字段，余额为 0 即视为不可用。
+
+### Fixed
+
+- 胶囊字体不再继承底栏正文字号，固定 `font-size: 12px; line-height: 18px`，与「缓存命中」那枚
+  原生胶囊同号（此前会大一号）；间距同步收成 `gap: 5px; padding: 1px 7px`。
+- 0.2.x 的 dock 不再保证有「缓存命中」胶囊（它改为承载 `activity` / `usage` 环境条目），
+  匹配不到时胶囊直接加入 dock 本身，而不是悄悄消失。
+
 ## [0.1.3-zh.4] - 2026-10-02
 
 ### Fixed
