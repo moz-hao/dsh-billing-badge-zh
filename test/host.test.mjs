@@ -10,10 +10,11 @@ import { apply, inject, name } from '../lib/index.js'
  */
 const source = readFileSync(new URL('../lib/index.js', import.meta.url), 'utf8')
 
-const build = ({ credentials, fetchImpl, env } = {}) => {
+const build = ({ credentials, fetchImpl, env, account } = {}) => {
   const routes = new Map()
   const ctx = {
     credentials,
+    get: account === undefined ? undefined : (service) => (service === 'deepseekAccount' ? account : undefined),
     inject: (_deps, cb) => cb({
       effect: (fn) => { fn(); return () => {} },
       webServer: { register: (o) => routes.set(o.path, o.handler) },
@@ -153,4 +154,68 @@ test('an HTTP failure degrades to a state the chip can render', async () => {
 test('the host half never writes to disk and never imports a filesystem module', () => {
   assert.doesNotMatch(source, /node:fs|writeFile|appendFile|mkdir/)
   assert.match(source, /api\.deepseek\.com\/user\/balance/, 'the only network destination')
+})
+
+/**
+ * The desktop 0.2.x profile signs in to a Platform account and usually carries
+ * no API key, so the account seam is the primary source. Its wallet shape has no
+ * `is_available` flag: a funded wallet is the only availability signal it has.
+ */
+const accountStub = (balance) => ({
+  getState: async () => ({ status: 'credential-stored' }),
+  getBalance: async () => balance,
+})
+
+test('reads the balance from the signed-in account before the key path', async () => {
+  let fetched = false
+  const { routes, restore } = build({
+    credentials: { resolve: async () => ({ value: 'k' }) },
+    fetchImpl: async () => { fetched = true; return ok({ balance_infos: [] }) },
+    account: accountStub({
+      status: 'ready',
+      value: [{ currency: 'CNY', balance: '30.5' }],
+      bonusWallets: [{ currency: 'CNY', balance: '2.25' }],
+    }),
+  })
+  const res = await call(routes.get('/plugins/billing-badge/balance'), { headers: { 'x-dsh-billing-badge': '1' } })
+  assert.equal(res.status, 200)
+  assert.equal(res.body.ok, true)
+  assert.equal(res.body.source, 'account')
+  assert.equal(res.body.currency, 'CNY')
+  assert.equal(res.body.toppedUp, 30.5)
+  assert.equal(res.body.granted, 2.25)
+  assert.equal(res.body.total, 32.75)
+  assert.equal(res.body.isAvailable, true)
+  assert.equal(fetched, false, 'the account reading is the only network destination when it works')
+  restore()
+})
+
+test('an empty account wallet is reported as unavailable, not as a zero balance', async () => {
+  const { routes, restore } = build({
+    credentials: { resolve: async () => ({ value: 'k' }) },
+    account: accountStub({ status: 'ready', value: [{ currency: 'CNY', balance: '0' }], bonusWallets: [] }),
+  })
+  const res = await call(routes.get('/plugins/billing-badge/balance'), { headers: { 'x-dsh-billing-badge': '1' } })
+  assert.equal(res.body.source, 'account')
+  assert.equal(res.body.total, 0)
+  assert.equal(res.body.isAvailable, false)
+  restore()
+})
+
+test('a signed-out account falls through to the API key path', async () => {
+  let seen = null
+  const { routes, restore } = build({
+    credentials: { resolve: async () => undefined },
+    env: 'from-env',
+    fetchImpl: async (_url, init) => {
+      seen = init.headers.authorization
+      return ok({ is_available: true, balance_infos: [{ currency: 'CNY', total_balance: 7, granted_balance: 0, topped_up_balance: 7 }] })
+    },
+    account: { getState: async () => ({ status: 'signed-out' }), getBalance: async () => { throw new Error('must not be called') } },
+  })
+  const res = await call(routes.get('/plugins/billing-badge/balance'), { headers: { 'x-dsh-billing-badge': '1' } })
+  assert.equal(seen, 'Bearer from-env')
+  assert.equal(res.body.source, undefined, 'the key path keeps its own shape')
+  assert.equal(res.body.total, 7)
+  restore()
 })
